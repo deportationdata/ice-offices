@@ -25,7 +25,8 @@ jobs:
       - name: Save current offices snapshot
         run: cp data/ice-offices.feather /tmp/old-ice-offices.feather
 
-      - uses: r-lib/actions/setup-renv@v2
+      - name: Restore renv library
+        run: Rscript -e "renv::restore()"
 
       - name: Run scraper
         run: Rscript code/offices-scraper.R
