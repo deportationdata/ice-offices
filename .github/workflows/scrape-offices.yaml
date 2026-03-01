@@ -74,12 +74,19 @@ jobs:
 
             # Check for modified details in offices present in both
             common <- intersect(new\$office_name, old\$office_name)
-            key_cols <- c('office_name', 'address', 'city', 'state', 'zip', 'area')
-            modified <- Filter(function(nm) {
-              o <- old |> filter(office_name == nm) |> select(any_of(key_cols))
-              n <- new |> filter(office_name == nm) |> select(any_of(key_cols))
-              !identical(o, n)
-            }, common)
+            key_cols <- c('address', 'city', 'state', 'zip', 'area')
+
+            modified_lines <- unlist(lapply(common, function(nm) {
+              o <- old |> filter(office_name == nm) |> select(any_of(key_cols)) |> slice(1)
+              n <- new |> filter(office_name == nm) |> select(any_of(key_cols)) |> slice(1)
+              if (identical(o, n)) return(NULL)
+              diffs <- unlist(lapply(key_cols, function(col) {
+                ov <- as.character(o[[col]])
+                nv <- as.character(n[[col]])
+                if (!identical(ov, nv)) paste0('  - ', col, ': `', ov, '` -> `', nv, '`')
+              }))
+              c(paste0('- **', nm, '**'), diffs)
+            }))
 
             lines <- character(0)
             if (length(added) > 0) {
@@ -92,9 +99,10 @@ jobs:
               lines <- c(lines, paste0('- ', removed))
               lines <- c(lines, '')
             }
-            if (length(modified) > 0) {
-              lines <- c(lines, paste0('**', length(modified), ' office(s) with modified details:**'))
-              lines <- c(lines, paste0('- ', modified))
+            if (length(modified_lines) > 0) {
+              n_modified <- sum(startsWith(modified_lines, '- **'))
+              lines <- c(lines, paste0('**', n_modified, ' office(s) with modified details:**'))
+              lines <- c(lines, modified_lines)
               lines <- c(lines, '')
             }
             if (length(lines) == 0) {

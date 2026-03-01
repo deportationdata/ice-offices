@@ -234,12 +234,12 @@ all_offices <-
     area
   )
 
-# get geocoding from last data, geocode only new ones
+# get geocoding from last data, geocode only offices with new or changed addresses
 existing_offices <- sfarrow::st_read_feather(
   "data/ice-offices-shp.feather"
 )
 
-new_offices <- anti_join(all_offices, existing_offices)
+new_offices <- anti_join(all_offices, existing_offices, by = "address_full")
 
 if (nrow(new_offices) > 0) {
   new_offices_geocoded <-
