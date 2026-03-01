@@ -263,11 +263,14 @@ if (nrow(new_offices) > 0) {
 offices_geocoded <-
   bind_rows(
     if (nrow(new_offices) > 0) {
-      new_offices_geocoded
+      st_drop_geometry(new_offices_geocoded) |>
+        select(address_full, office_latitude, office_longitude)
     } else {
       tibble()
     },
-    existing_offices
+    existing_offices |>
+      st_drop_geometry() |>
+      select(address_full, office_latitude, office_longitude)
   ) |>
   filter(!is.na(office_latitude) & !is.na(office_longitude)) |>
   distinct(address_full, office_latitude, office_longitude)
