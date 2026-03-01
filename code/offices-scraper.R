@@ -193,6 +193,7 @@ n_sub_pages <- get_num_pages("https://www.ice.gov/contact/check-in")
 # scrape both types of offices
 field_offices <- map_dfr(0:(n_field_pages - 1), function(i) {
   url <- paste0("https://www.ice.gov/contact/field-offices?page=", i)
+  Sys.sleep(1)
   scrape_field_offices(url)
 }) |>
   distinct()
@@ -206,6 +207,7 @@ field_offices <-
 
 sub_offices <- map_dfr(0:(n_sub_pages - 1), function(i) {
   url <- paste0("https://www.ice.gov/contact/check-in?page=", i)
+  Sys.sleep(1)
   scrape_sub_offices(url)
 })
 
