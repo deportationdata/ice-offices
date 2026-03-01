@@ -241,7 +241,7 @@ if (nrow(new_offices) > 0) {
     new_offices |>
     geocode(
       address = address_full,
-      method = "google",
+      method = "arcgis",
       lat = office_latitude,
       long = office_longitude
     ) |>
@@ -255,7 +255,7 @@ if (nrow(new_offices) > 0) {
     )
 }
 
-offices_geocoded <- 
+offices_geocoded <-
   bind_rows(
     if (nrow(new_offices) > 0) {
       new_offices_geocoded
@@ -263,30 +263,32 @@ offices_geocoded <-
       tibble()
     },
     existing_offices
-  ) |> 
+  ) |>
   filter(!is.na(office_latitude) & !is.na(office_longitude)) |>
   distinct(address_full, office_latitude, office_longitude)
 
-  # combine with existing geocoded offices
+# combine with existing geocoded offices
 library(tidylog)
 
 all_offices_geocoded <-
-  all_offices |> 
+  all_offices |>
   left_join(offices_geocoded |> distinct(address_full, .keep_all = TRUE)) |>
   mutate(
-    area_of_responsibility_name = 
-      case_when(
-        office_name == "Miramar Sub Office" & sub_office == FALSE ~ "Miami", # field office moved to Miramar
-        office_name == "St. Paul Field Office" & sub_office == FALSE ~ "St Paul", # field office renamed moved to St. Paul
-        agency == "ERO" & !sub_office ~ str_remove(office_name, " Field Office"),
-        TRUE ~ NA_character_
-      )
+    area_of_responsibility_name = case_when(
+      office_name == "Miramar Sub Office" & sub_office == FALSE ~ "Miami", # field office moved to Miramar
+      office_name == "St. Paul Field Office" & sub_office == FALSE ~ "St Paul", # field office renamed moved to St. Paul
+      agency == "ERO" & !sub_office ~ str_remove(office_name, " Field Office"),
+      TRUE ~ NA_character_
+    )
   ) |>
   left_join(
-    aor_sf |> select(-office_name) |> as_tibble() |> rename(geometry_aor = geometry),
+    aor_sf |>
+      select(-office_name) |>
+      as_tibble() |>
+      rename(geometry_aor = geometry),
     by = c("area_of_responsibility_name")
-  ) |> 
-  select(-area_of_responsibility_name) |> 
+  ) |>
+  select(-area_of_responsibility_name) |>
   st_as_sf(
     coords = c("office_longitude", "office_latitude"),
     crs = 4326,
@@ -294,7 +296,7 @@ all_offices_geocoded <-
     agr = "constant",
     na.fail = FALSE,
     sf_column_name = "geometry_office"
-  ) 
+  )
 
 sfarrow::st_write_feather(
   all_offices_geocoded,
@@ -350,4 +352,3 @@ zip(
   ),
   flags = "-j"
 )
-
