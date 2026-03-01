@@ -20,21 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          lfs: false
-          sparse-checkout: |
-            code/offices-scraper.R
-            data/ice-aor-shp.feather
-            data/ice-offices-shp.feather
-            data/ice-offices.feather
-            renv.lock
-            renv/
-          sparse-checkout-cone-mode: false
-
-      - name: Fetch LFS files
-        run: |
-          git lfs pull --include="data/ice-aor-shp.feather"
-          git lfs pull --include="data/ice-offices-shp.feather"
-          git lfs pull --include="data/ice-offices.feather"
+          lfs: true
 
       - name: Save current offices snapshot
         run: cp data/ice-offices.feather /tmp/old-ice-offices.feather
@@ -122,7 +108,6 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git commit -m "Update offices data [skip ci]"
-          git pull --rebase origin main
           git push --set-upstream origin HEAD
 
       - name: Create pull request
