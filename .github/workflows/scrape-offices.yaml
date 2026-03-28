@@ -15,7 +15,7 @@ jobs:
     runs-on: [self-hosted]
 
     env:
-      RENV_PATHS_LIBRARY: ~/renv-cache/ice-offices
+      RENV_PATHS_CACHE: ~/renv-cache
 
     steps:
       - uses: actions/checkout@v4
@@ -26,7 +26,11 @@ jobs:
         run: cp data/ice-offices.feather /tmp/old-ice-offices.feather
 
       - name: Restore renv library
-        run: Rscript -e "renv::hydrate(); renv::restore()"
+        run: |
+          Rscript -e "
+            renv::hydrate(sources = '~/R/aarch64-unknown-linux-gnu-library/4.5')
+            renv::restore()
+          "
 
       - name: Run scraper
         run: Rscript code/offices-scraper.R
