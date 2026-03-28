@@ -61,8 +61,6 @@ jobs:
             done
           done
 
-          echo "changed=true" >> $GITHUB_OUTPUT
-
           # Generate change summary comparing old vs new offices
           Rscript -e "
             suppressPackageStartupMessages({
@@ -110,10 +108,21 @@ jobs:
               lines <- c(lines, '')
             }
             if (length(lines) == 0) {
-              lines <- 'Data files updated (no changes to office names or details).'
+              writeLines('NO_REAL_CHANGES', '/tmp/office-changes.txt')
+            } else {
+              writeLines(lines, '/tmp/office-changes.txt')
             }
-            writeLines(lines, '/tmp/office-changes.txt')
           "
+
+          # If binary files changed but data content is identical, discard and skip
+          if grep -qF 'NO_REAL_CHANGES' /tmp/office-changes.txt; then
+            echo "Binary files differ but data content is identical — skipping."
+            git reset HEAD -- data/
+            git checkout -- data/
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Commit and push
         if: steps.check_changes.outputs.changed == 'true'
