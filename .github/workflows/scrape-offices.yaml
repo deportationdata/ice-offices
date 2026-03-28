@@ -78,7 +78,7 @@ jobs:
 
             # Check for modified details in offices present in both
             common <- intersect(new\$office_name, old\$office_name)
-            key_cols <- c('address', 'city', 'state', 'zip', 'area')
+            key_cols <- setdiff(names(new), 'office_name')
 
             modified_lines <- unlist(lapply(common, function(nm) {
               o <- old |> filter(office_name == nm) |> select(any_of(key_cols)) |> slice(1)
