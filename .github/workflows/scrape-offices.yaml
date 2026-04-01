@@ -21,9 +21,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
+          clean: true
 
-      - name: Save current offices snapshot
-        run: cp data/ice-offices.feather /tmp/old-ice-offices.feather
+      - name: Ensure clean working tree and save current snapshot
+        run: |
+          git lfs pull
+          git checkout -- .
+          cp data/ice-offices.feather /tmp/old-ice-offices.feather
 
       - name: Restore renv library
         run: |
