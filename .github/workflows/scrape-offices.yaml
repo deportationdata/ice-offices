@@ -98,3 +98,11 @@ jobs:
             --body-file /tmp/pr-body.txt \
             --reviewer graemeblair \
             --base main
+
+      - name: Trigger deportationdata.org rebuild
+        if: steps.check_changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DISPATCH_TOKEN }}
+        run: |
+          gh api repos/deportationdata/deportationdata.org/dispatches \
+            -f event_type=offices-updated
