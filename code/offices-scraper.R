@@ -214,17 +214,16 @@ sub_offices <- map_dfr(0:(n_sub_pages - 1), function(i) {
 # combine into one dataframe
 all_offices <-
   bind_rows(
-    `FALSE` = field_offices,
-    `TRUE` = sub_offices,
-    .id = "sub_office"
+    `Field office` = field_offices,
+    `Sub-office` = sub_offices,
+    .id = "office_type"
   ) |>
-  mutate(sub_office = as.logical(sub_office)) |>
   transmute(
     office_name,
     office_name_short,
     agency,
     field_office_name,
-    sub_office,
+    office_type,
     address,
     city,
     state,
@@ -283,9 +282,9 @@ all_offices_geocoded <-
   left_join(offices_geocoded |> distinct(address_full, .keep_all = TRUE)) |>
   mutate(
     area_of_responsibility_name = case_when(
-      office_name == "Miramar Sub Office" & sub_office == FALSE ~ "Miami", # field office moved to Miramar
-      office_name == "St. Paul Field Office" & sub_office == FALSE ~ "St Paul", # field office renamed moved to St. Paul
-      agency == "ERO" & !sub_office ~ str_remove(office_name, " Field Office"),
+      office_name == "Miramar Sub Office" & office_type == "Field office" ~ "Miami", # field office moved to Miramar
+      office_name == "St. Paul Field Office" & office_type == "Field office" ~ "St Paul", # field office renamed moved to St. Paul
+      agency == "ERO" & office_type == "Field office" ~ str_remove(office_name, " Field Office"),
       TRUE ~ NA_character_
     )
   ) |>
