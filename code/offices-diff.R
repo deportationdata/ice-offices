@@ -3,8 +3,8 @@ suppressPackageStartupMessages({
   library(dplyr)
 })
 
-old <- read_feather("/tmp/old-ice-offices.feather")
-new <- read_feather("data/ice-offices.feather")
+old <- read_parquet("/tmp/old-ice-offices.parquet")
+new <- read_parquet("data/ice-offices.parquet")
 
 added   <- setdiff(new$office_name, old$office_name)
 removed <- setdiff(old$office_name, new$office_name)

@@ -27,7 +27,7 @@ jobs:
         run: |
           git lfs pull
           git checkout -- .
-          cp data/ice-offices.feather /tmp/old-ice-offices.feather
+          cp data/ice-offices.parquet /tmp/old-ice-offices.parquet
 
       - name: Restore renv library
         run: |

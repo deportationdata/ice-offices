@@ -11,7 +11,7 @@ library(tigris)
 
 # --- Load AOR shapefile ---
 
-aor_sf <- sfarrow::st_read_feather("data/ice-aor-shp.feather")
+aor_sf <- sfarrow::st_read_parquet("data/ice-aor-shp.parquet")
 
 # --- Scrape ICE offices ---
 
@@ -235,8 +235,8 @@ all_offices <-
   )
 
 # get geocoding from last data, geocode only offices with new or changed addresses
-existing_offices <- sfarrow::st_read_feather(
-  "data/ice-offices-shp.feather"
+existing_offices <- sfarrow::st_read_parquet(
+  "data/ice-offices-shp.parquet"
 )
 
 new_offices <- anti_join(all_offices, existing_offices, by = "address_full")
@@ -306,16 +306,16 @@ all_offices_geocoded <-
     sf_column_name = "geometry_office"
   )
 
-sfarrow::st_write_feather(
+sfarrow::st_write_parquet(
   all_offices_geocoded,
-  "data/ice-offices-shp.feather"
+  "data/ice-offices-shp.parquet"
 )
 
-arrow::write_feather(
+arrow::write_parquet(
   all_offices_geocoded |>
     st_drop_geometry() |>
     select(-contains("geometry_")),
-  "data/ice-offices.feather"
+  "data/ice-offices.parquet"
 )
 
 # save as xlsx

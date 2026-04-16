@@ -48,7 +48,7 @@ hq_aor_df <- tibble(area_of_responsibility_name = "HQ")
 aor_county_sf <-
   bind_rows(aor_county_sf, hq_aor_df)
 
-sfarrow::st_write_feather(aor_county_sf, "data/ice-aor-county-shp.feather")
+sfarrow::st_write_parquet(aor_county_sf, "data/ice-aor-county-shp.parquet")
 
 temp_dir <- tempdir()
 temp_shp_path <- file.path(temp_dir, "ice-aor-county-shp.shp")
@@ -81,7 +81,7 @@ aor_sf <-
   summarize(geometry = st_union(geometry), .groups = "drop") |>
   st_cast("MULTIPOLYGON")
 
-sfarrow::st_write_feather(aor_sf, "data/ice-aor-shp.feather")
+sfarrow::st_write_parquet(aor_sf, "data/ice-aor-shp.parquet")
 
 temp_dir <- tempdir()
 temp_shp_path <- file.path(temp_dir, "ice-aor-shp.shp")
