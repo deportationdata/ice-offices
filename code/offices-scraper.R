@@ -246,11 +246,11 @@ if (nrow(new_offices) > 0) {
     geocode(
       address = address_full,
       method = "arcgis",
-      lat = office_latitude,
-      long = office_longitude
+      lat = latitude,
+      long = longitude
     ) |>
     st_as_sf(
-      coords = c("office_longitude", "office_latitude"),
+      coords = c("longitude", "latitude"),
       crs = 4326,
       remove = FALSE,
       agr = "constant",
@@ -263,16 +263,16 @@ offices_geocoded <-
   bind_rows(
     if (nrow(new_offices) > 0) {
       st_drop_geometry(new_offices_geocoded) |>
-        select(address_full, office_latitude, office_longitude)
+        select(address_full, latitude, longitude)
     } else {
       tibble()
     },
     existing_offices |>
       st_drop_geometry() |>
-      select(address_full, office_latitude, office_longitude)
+      select(address_full, latitude, longitude)
   ) |>
-  filter(!is.na(office_latitude) & !is.na(office_longitude)) |>
-  distinct(address_full, office_latitude, office_longitude)
+  filter(!is.na(latitude) & !is.na(longitude)) |>
+  distinct(address_full, latitude, longitude)
 
 # combine with existing geocoded offices
 library(tidylog)
@@ -297,7 +297,7 @@ all_offices_geocoded <-
   ) |>
   select(-area_of_responsibility_name) |>
   st_as_sf(
-    coords = c("office_longitude", "office_latitude"),
+    coords = c("longitude", "latitude"),
     crs = 4326,
     remove = FALSE,
     agr = "constant",
